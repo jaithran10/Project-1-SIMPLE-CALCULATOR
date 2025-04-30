@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+div
+ {
+  border: 10px solid black;
+  background-color: #965;
+  padding-top: 50px;
+  padding-right: 40px;
+  padding-bottom: 50px;
+  padding-left: 40px;
+    }
+ h1.wrap{
+    text-align: center;
+    padding: 5px;
+    }
+ h1.wrap span{
+    border: 2px solid black;
+    border-radius: 15px;
+    background-color:green;
+    color:white;
+    padding:7px;
+  }
+  table{
+  width:70%;
+  height:300px;
+  border:2px solid black;
+  background:black;
+  margin: auto;
+  border-radius:10px;
+  }
+  th,td{
+  padding:5px;
+  }
+  button{
+  width:30px;
+  height:30px;
+  background-color:cyan;
+  border-radius:5px;
+  }
+  textarea{
+  background-color:Cyan;
+  color:Black;
+  font-size:15px;
+  }
+</style>
+</head>
+<body>
+<h1 class="wrap"><span>CALCULATOR</span></h1><br>
+<table>
+<tr>
+<th colspan="4"><textarea></textarea></th>
+</tr>
+<tr>
+<th><button type="text">1</button></th>
+<th><button type="text">2</button></th>
+<th><button type="text">3</button></th>
+<th><button type="text">*</button></th>
+</tr>
+<tr>
+<th><button type="text">4</button></th>
+<th><button type="text">5</button></th>
+<th><button type="text">6</button></th>
+<th><button type="text">/</button></th>
+</tr>
+<tr>
+<th><button type="text">7</button></th>
+<th><button type="text">8</button></th>
+<th><button type="text">9</button></th>
+<th><button type="text">+</button></th>
+</tr>
+<tr>
+<th><button type="text">0</button></th>
+<th><button type="text">=</button></th>
+<th><button type="text">-</button></th>
+<th><button type="text">C</button></th>
+</tr>
+</table>
+<script>
+  const display = document.querySelector("textarea");
+  const buttons = document.querySelectorAll("button");
+  let currentInput = "";
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+      const value = button.textContent;
+   if (value === "=") {
+        try {
+          currentInput = eval(currentInput).toString();
+        } catch {
+          currentInput = "Error";
+        }
+      } else if (value === "C") {
+        currentInput = "";
+      } else {
+        currentInput += value;
+      }
+     display.value = currentInput;
+    });
+  });
+</script>
+</body>
+</html>
