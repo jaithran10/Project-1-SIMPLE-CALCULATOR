@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
  h1.wrap{
     text-align: center;
@@ -19,7 +18,7 @@
   height:300px;
   border:2px solid black;
   background:black;
-  margin: auto;
+  margin:auto;
   border-radius:10px;
   }
   th,td{
@@ -35,6 +34,8 @@
   background-color:Cyan;
   color:Black;
   font-size:15px;
+  border-radius:10px;
+  resize:none;
   }
 </style>
 </head>
@@ -68,6 +69,12 @@
 <th><button type="text">-</button></th>
 <th><button type="text">C</button></th>
 </tr>
+<tr>
+<th><button type="text">.</button></th>
+<th><button type="text">^</button></th>
+<th><button type="text">del</button></th>
+<th><button type="text">√</button></th>
+</tr>
 </table>
 <script>
   const display = document.querySelector("textarea");
@@ -84,7 +91,17 @@
         }
       } else if (value === "C") {
         currentInput = "";
-      } else {
+      }
+      else if (value==="^"){
+      currentInput+="**";
+      }
+       else if (value ==="del"){
+       currentInput =currentInput.substring(0,currentInput.length-1);
+       }
+       else if (value === "√") {
+       currentInput = Math.sqrt(eval(currentInput)).toString();
+       }
+       else {
         currentInput += value;
       }
      display.value = currentInput;
