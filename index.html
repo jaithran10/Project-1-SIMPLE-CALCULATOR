@@ -86,7 +86,7 @@
       const value = button.textContent;
    if (value === "=") {
         try {
-          currentInput = eval(currentInput).toString();
+          currentInput = eval(currentInput);
         } catch {
           currentInput = "Error";
         }
