@@ -1,113 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
- <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
- h1.wrap{
-    text-align: center;
-    padding: 5px;
-    }
- h1.wrap span{
-    border: 2px solid black;
-    border-radius: 15px;
-    background-color:green;
-    color:white;
-    padding:7px;
-  }
-  table{
-  width:50%;
-  height:300px;
-  border:2px solid black;
-  background:black;
-  margin:auto;
-  border-radius:10px;
-  }
-  th,td{
-  padding:5px;
-  }
-  button{
-  width:30px;
-  height:30px;
-  background-color:cyan;
-  border-radius:5px;
-  }
-  textarea{
-  background-color:Cyan;
-  color:Black;
-  font-size:15px;
-  border-radius:10px;
-  resize:none;
-  }
-</style>
+    <title>Advanced Infix Calculator</title>
 </head>
 <body>
-<h1 class="wrap"><span>CALCULATOR</span></h1><br>
-<table>
-<tr>
-<th colspan="4"><textarea></textarea></th>
-</tr>
-<tr>
-<th><button type="text">1</button></th>
-<th><button type="text">2</button></th>
-<th><button type="text">3</button></th>
-<th><button type="text">*</button></th>
-</tr>
-<tr>
-<th><button type="text">4</button></th>
-<th><button type="text">5</button></th>
-<th><button type="text">6</button></th>
-<th><button type="text">/</button></th>
-</tr>
-<tr>
-<th><button type="text">7</button></th>
-<th><button type="text">8</button></th>
-<th><button type="text">9</button></th>
-<th><button type="text">+</button></th>
-</tr>
-<tr>
-<th><button type="text">0</button></th>
-<th><button type="text">√</button></th>
-<th><button type="text">-</button></th>
-<th><button type="text">C</button></th>
-</tr>
-<tr>
-<th><button type="text">.</button></th>
-<th><button type="text">^</button></th>
-<th><button type="text">del</button></th>
-<th><button type="text">=</button></th>
-</tr>
-</table>
+<h2>Infix Expression Calculator</h2>
+<input type="text" id="infix" placeholder="E.g., 3+sqrt(16)*2^3">
+<button onclick="calculate()">Evaluate</button>
+
+<p id="postfixOutput"></p>
+<p id="resultOutput"></p>
+
 <script>
-  const display = document.querySelector("textarea");
-  const buttons = document.querySelectorAll("button");
-  let currentInput = "";
-  buttons.forEach(button => {
-    button.addEventListener("click", () => {
-      const value = button.textContent;
-   if (value === "=") {
-        try {
-          currentInput = eval(currentInput).toString();
-        } catch {
-          currentInput = "Error";
+// Helper functions
+function isOperator(c) {
+    return ['+', '-', '*', '/', '^'].includes(c);
+}
+
+function priority(op) {
+    if (op === '+' || op === '-') return 1;
+    if (op === '*' || op === '/') return 2;
+    if (op === '^') return 3;
+    if (op === '√') return 4; // highest priority
+    return 0;
+}
+
+function isRightAssociative(op) {
+    return op === '^' || op === '√';
+}
+
+// Convert infix to postfix
+function infixToPostfix(expr) {
+    let stack = [];
+    let postfix = [];
+    let i = 0;
+
+    while (i < expr.length) {
+        let c = expr[i];
+
+        if (c === ' ') { i++; continue; }
+
+        // Multi-digit number or decimal
+        if (!isNaN(c) || c === '.') {
+            let num = '';
+            while (i < expr.length && (!isNaN(expr[i]) || expr[i] === '.')) {
+                num += expr[i++];
+            }
+            postfix.push(num);
+            continue;
         }
-      } else if (value === "C") {
-        currentInput = "";
-      }
-      else if (value==="^"){
-      currentInput+="**";
-      }
-       else if (value ==="del"){
-       currentInput =currentInput.substring(0,currentInput.length-1);
-       }
-       else if (value === "√") {
-       currentInput = Math.sqrt(eval(currentInput)).toString();
-       }
-       else {
-        currentInput += value;
-      }
-     display.value = currentInput;
-    });
-  });
+
+        // Function: sqrt()
+        if (expr.substring(i, i+4) === "sqrt") {
+            stack.push('√');
+            i += 4;
+            continue;
+        }
+
+        if (c === '(') {
+            stack.push(c);
+        } else if (c === ')') {
+            while (stack.length && stack[stack.length-1] !== '(') {
+                postfix.push(stack.pop());
+            }
+            stack.pop(); // remove '('
+        } else if (isOperator(c)) {
+            while (
+                stack.length &&
+                stack[stack.length-1] !== '(' &&
+                (priority(stack[stack.length-1]) > priority(c) ||
+                 (priority(stack[stack.length-1]) === priority(c) && !isRightAssociative(c)))
+            ) {
+                postfix.push(stack.pop());
+            }
+            stack.push(c);
+        }
+        i++;
+    }
+
+    while (stack.length) {
+        postfix.push(stack.pop());
+    }
+
+    return postfix;
+}
+
+// Evaluate postfix
+function evaluatePostfix(postfix) {
+    let stack = [];
+
+    for (let token of postfix) {
+        if (!isNaN(token)) {
+            stack.push(parseFloat(token));
+        } else if (token === '√') {
+            let a = stack.pop();
+            stack.push(Math.sqrt(a));
+        } else {
+            let b = stack.pop();
+            let a = stack.pop();
+            switch(token) {
+                case '+': stack.push(a+b); break;
+                case '-': stack.push(a-b); break;
+                case '*': stack.push(a*b); break;
+                case '/': stack.push(a/b); break;
+                case '^': stack.push(Math.pow(a,b)); break;
+            }
+        }
+    }
+
+    return stack.pop();
+}
+
+// Main function
+function calculate() {
+    const expr = document.getElementById('infix').value;
+    const postfix = infixToPostfix(expr);
+    const result = evaluatePostfix(postfix);
+
+    document.getElementById('postfixOutput').innerText = "Postfix: " + postfix.join(' ');
+    document.getElementById('resultOutput').innerText = "Result: " + result;
+}
 </script>
 </body>
 </html>
